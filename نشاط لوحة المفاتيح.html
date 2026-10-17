@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>طريق الجواهر - لوحة المفاتيح</title>
+<style>
+:root{
+  --key-w: 34px;
+  --key-h: 32px;
+  --gap: 3px;
+  --green-bg:#dff0d2;
+  --green-border:#78b85a;
+  --blue-bg:#d8efff;
+  --blue-border:#36a9e8;
+  --key-bg:#f8f8f8;
+  --key-border:#777;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; padding:18px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:16px; background:#f0f4f8;
+  font-family:Arial,"Segoe UI",Tahoma,sans-serif;
+}
+.header{
+  width:min(100%,760px); padding:14px 20px; border-radius:12px;
+  background:#fff; box-shadow:0 3px 12px #00000012; text-align:center;
+  direction:rtl;
+}
+h1{font-size:21px;margin:0 0 8px;color:#333}
+#instruction{font-size:20px;font-weight:700;color:#0066cc}
+#message{min-height:22px;margin-top:8px;font-size:16px;font-weight:bold}
+.keyboard{
+  direction:ltr; display:flex; flex-direction:column; gap:var(--gap);
+  width:max-content; max-width:100%; padding:7px;
+  background:#e9e9e9; border:2px solid #777; border-radius:8px;
+  box-shadow:0 5px 0 #aaa,0 9px 18px #0000001c;
+}
+.row{display:flex; align-items:center; gap:var(--gap); min-height:var(--key-h)}
+.key{
+  flex:0 0 var(--key-w); width:var(--key-w); height:var(--key-h);
+  padding:2px; display:flex; align-items:center; justify-content:center;
+  position:relative; user-select:none; cursor:pointer; overflow:hidden;
+  background:var(--key-bg); border:1px solid var(--key-border);
+  border-radius:5px; box-shadow:0 2px 0 #aaa;
+  color:#111; font:11px Arial,sans-serif; text-align:center; line-height:1.05;
+  transition:transform .1s,background-color .15s;
+}
+.key:active{transform:translateY(2px);box-shadow:none}
+.key.green{background:var(--green-bg);border:1.5px solid var(--green-border)}
+/* تظهر الرموز أعلى الأرقام كما على لوحة المفاتيح الحقيقية؛ تُكتب باستخدام Shift */
+.key.blue[data-key='1'],.key.blue[data-key='2'],.key.blue[data-key='3'],.key.blue[data-key='4'],.key.blue[data-key='5'],.key.blue[data-key='6'],.key.blue[data-key='7'],.key.blue[data-key='8'],.key.blue[data-key='9'],.key.blue[data-key='0']{font-weight:600;line-height:1.05}
+.key.blue{background:var(--blue-bg);border:1.5px solid var(--blue-border)}
+.key.wide{flex-basis:40px;width:40px;font-size:9px}
+.key.esc{margin-right:18px}
+.key.group-gap{margin-left:13px}
+.key.tab{flex-basis:43px;width:43px;justify-content:flex-start;padding-left:4px}
+.key.caps{flex-basis:53px;width:53px;justify-content:flex-start;padding-left:4px;font-size:9px}
+.key.shift{flex-basis:64px;width:64px;justify-content:flex-start;padding-left:4px}
+.key.enter{flex-basis:64px;width:64px;justify-content:flex-start;padding-left:5px}
+.key.backspace{flex-basis:57px;width:57px}
+.key.space{flex-basis:194px;width:194px}
+.key.nav{flex-basis:35px;width:35px;font-size:9px}
+.key.arrow{flex-basis:30px;width:30px;height:30px;font-size:16px}
+.key.arrow-spacer{visibility:hidden;pointer-events:none}
+.main-row{display:flex;gap:var(--gap);align-items:center}
+.nav-cluster{display:flex;flex-direction:column;gap:var(--gap);margin-left:8px}
+.nav-row{display:flex;gap:var(--gap)}
+.nav-row .key{height:var(--key-h)}
+.arrows{display:flex;flex-direction:column;gap:var(--gap);margin-left:8px}
+.arrows-bottom{display:flex;gap:var(--gap)}
+.gem{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);
+  font-size:23px;opacity:0;transition:transform .25s,opacity .25s;
+  pointer-events:none;z-index:2;filter:drop-shadow(0 0 3px white)
+}
+.key.correct .gem{opacity:1;transform:translate(-50%,-50%) scale(1.1)}
+.key.combo-selected{background:#fff2b3!important;border-color:#e0a800!important;box-shadow:0 0 0 2px #ffd54f,0 2px 0 #aaa}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.shake{animation:shake .25s;background:#ffcccc!important;border-color:#d00!important}
+#win-screen{display:none;text-align:center;background:white;padding:30px;border-radius:14px;box-shadow:0 8px 24px #0002;direction:rtl}
+#win-screen h2{color:#28a745;font-size:30px}
+#win-screen p{font-size:18px}
+button.restart{padding:10px 20px;font-size:17px;background:#0066cc;color:#fff;border:0;border-radius:8px;cursor:pointer}
+@media(max-width:760px){
+ body{padding:10px;justify-content:flex-start}
+ .keyboard{transform-origin:top center; transform:scale(.82); margin-bottom:-55px}
+ .header{padding:12px}
+ #instruction{font-size:17px}
+}
+@media(max-width:600px){
+ .keyboard{transform:scale(.62);margin-bottom:-115px}
+}
+</style>
+</head>
+<body>
+<section class="header" id="header">
+  <h1>طريق الجواهر - لوحة المفاتيح</h1>
+  <div id="instruction">جاري التحميل...</div>
+  <div id="message" aria-live="polite"></div>
+</section>
+
+<div class="keyboard" id="keyboard" aria-label="لوحة مفاتيح تفاعلية">
+  <div class="row">
+    <div class="key esc" data-key="Esc">Esc</div>
+    <div class="key group-gap" data-key="F1">F1</div><div class="key" data-key="F2">F2</div><div class="key" data-key="F3">F3</div><div class="key" data-key="F4">F4</div>
+    <div class="key group-gap" data-key="F5">F5</div><div class="key" data-key="F6">F6</div><div class="key" data-key="F7">F7</div><div class="key" data-key="F8">F8</div>
+    <div class="key group-gap" data-key="F9">F9</div><div class="key" data-key="F10">F10</div><div class="key" data-key="F11">F11</div><div class="key" data-key="F12">F12</div>
+    <div class="nav-cluster" style="flex-direction:row;margin-left:8px">
+      <div class="key nav" data-key="PrintScreen">Print<br>Screen</div><div class="key nav" data-key="ScrollLock">Scroll<br>Lock</div><div class="key nav" data-key="PauseBreak">Pause<br>Break</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="key" style="flex-direction:column">~<br>`</div>
+    <div class="key blue" data-key="1" style="flex-direction:column">!<br>1</div>
+    <div class="key blue" data-key="2" style="flex-direction:column">@<br>2</div>
+    <div class="key blue" data-key="3" style="flex-direction:column">#<br>3</div>
+    <div class="key blue" data-key="4" style="flex-direction:column">$<br>4</div>
+    <div class="key blue" data-key="5" style="flex-direction:column">%<br>5</div>
+    <div class="key blue" data-key="6" style="flex-direction:column">^<br>6</div>
+    <div class="key blue" data-key="7" style="flex-direction:column">&amp;<br>7</div>
+    <div class="key blue" data-key="8" style="flex-direction:column">*<br>8</div>
+    <div class="key blue" data-key="9" style="flex-direction:column">(<br>9</div>
+    <div class="key blue" data-key="0" style="flex-direction:column">)<br>0</div>
+    <div class="key" style="flex-direction:column">_<br>-</div><div class="key" style="flex-direction:column">+<br>=</div>
+    <div class="key blue backspace" data-key="Backspace">Backspace<br>←</div>
+    <div class="nav-cluster">
+      <div class="nav-row"><div class="key nav" data-key="Insert">Insert</div><div class="key nav" data-key="Home">Home</div><div class="key nav" data-key="PageUp">Page<br>Up</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="key tab" style="background:var(--green-bg);border-color:var(--green-border)">Tab<br>↹</div>
+    <div class="key green" data-key="Q">Q<br>ض</div><div class="key green" data-key="W">W<br>ص</div><div class="key green" data-key="E">E<br>ث</div><div class="key green" data-key="R">R<br>ق</div><div class="key green" data-key="T">T<br>ف</div><div class="key green" data-key="Y">Y<br>غ</div><div class="key green" data-key="U">U<br>ع</div><div class="key green" data-key="I">I<br>ه</div><div class="key green" data-key="O">O<br>خ</div><div class="key green" data-key="P">P<br>ح</div>
+    <div class="key green" style="flex-direction:column">{<br>[</div><div class="key green" style="flex-direction:column">}<br>]</div><div class="key green" style="flex-direction:column">|<br>\</div>
+    <div class="nav-cluster"><div class="nav-row"><div class="key nav" data-key="Delete">Delete</div><div class="key nav" data-key="End">End</div><div class="key nav" data-key="PageDown">Page<br>Down</div></div></div>
+  </div>
+
+  <div class="row">
+    <div class="key caps" style="background:var(--green-bg);border-color:var(--green-border)">Caps Lock<br>Ⓐ</div>
+    <div class="key green" data-key="A">A<br>ش</div><div class="key green" data-key="S">S<br>س</div><div class="key green" data-key="D">D<br>ي</div><div class="key green" data-key="F">F<br>ب</div><div class="key green" data-key="G">G<br>ل</div><div class="key green" data-key="H">H<br>ا</div><div class="key green" data-key="J">J<br>ت</div><div class="key green" data-key="K">K<br>ن</div><div class="key green" data-key="L">L<br>م</div>
+    <div class="key green" style="flex-direction:column">:<br>;</div><div class="key green" style="flex-direction:column">"<br>'</div>
+    <div class="key blue enter" data-key="Enter">Enter<br>↵</div>
+  </div>
+
+  <div class="row">
+    <div class="key shift" data-key="Shift" style="background:var(--green-bg);border-color:var(--green-border)">Shift<br>⇧</div>
+    <div class="key green" data-key="Z">Z<br>ئ</div><div class="key green" data-key="X">X<br>ء</div><div class="key green" data-key="C">C<br>ؤ</div><div class="key green" data-key="V">V<br>ر</div><div class="key green" data-key="B">B<br>لا</div><div class="key green" data-key="N">N<br>ى</div><div class="key green" data-key="M">M<br>ة</div>
+    <div class="key green" style="flex-direction:column">&lt;<br>,</div><div class="key green" style="flex-direction:column">&gt;<br>.</div><div class="key green" style="flex-direction:column">?<br>/</div>
+    <div class="key shift" data-key="Shift" style="background:var(--green-bg);border-color:var(--green-border)">Shift<br>⇧</div>
+    <div class="arrows" style="flex-direction:row;margin-left:auto"><div class="key arrow blue arrow-spacer"> </div><div class="key arrow blue" data-key="UpArrow">↑</div></div>
+  </div>
+
+  <div class="row">
+    <div class="key" style="font-size:9px">Ctrl<br>✳</div><div class="key" style="font-size:14px">⊞</div><div class="key">Alt</div>
+    <div class="key space blue" data-key="Spacebar"></div>
+    <div class="key">Alt</div><div class="key" style="font-size:14px">⊞</div><div class="key" style="font-size:16px">☰</div><div class="key" style="font-size:9px">Ctrl<br>✳</div>
+    <div class="arrows" style="flex-direction:row;margin-left:8px"><div class="key arrow blue" data-key="LeftArrow">←</div><div class="key arrow blue" data-key="DownArrow">↓</div><div class="key arrow blue" data-key="RightArrow">→</div></div>
+  </div>
+</div>
+
+<section id="win-screen">
+  <h2>🎉 مبروك! 🎉</h2>
+  <p>لقد أكملت طريق الجواهر واكتشفت كل المفاتيح بنجاح!</p>
+  <button class="restart" onclick="startGame()">العب مرة أخرى</button>
+</section>
+
+<script>
+const keysToFind = [
+  {id:'Spacebar',text:'أين يوجد مفتاح المسافة (Spacebar)؟'},
+  {id:'Enter',text:'أين يوجد مفتاح الإدخال (Enter)؟'},
+  {id:'Backspace',text:'أين يوجد مفتاح المسافة للخلف (Backspace)؟'},
+  {id:'1',text:'أين يوجد مفتاح الرقم 1؟'},
+  {id:'A',text:'أين يوجد مفتاح الحرف A؟'},
+  {id:'UpArrow',text:'أين يوجد مفتاح السهم للأعلى؟'},
+  {id:'Shift2',text:'للوصول إلى الرمز @ أعلى الرقم 2، اضغط على مفتاح Shift والرقم 2 معًا لتحصل على الجوهرة.'}
+];
+let currentKeyIndex=0;
+const instructionEl=document.getElementById('instruction');
+const messageEl=document.getElementById('message');
+const keyboardEl=document.getElementById('keyboard');
+const headerEl=document.getElementById('header');
+const winScreen=document.getElementById('win-screen');
+
+let comboPressed = new Set();
+
+document.querySelectorAll('.key').forEach(key=>{
+  const gem=document.createElement('span');
+  gem.className='gem';gem.textContent='💎';key.appendChild(gem);
+  key.addEventListener('click',()=>{
+    const currentTarget=keysToFind[currentKeyIndex];
+    if(!currentTarget)return;
+
+    // في سؤال Shift + 2 يجب اختيار المفتاحين؛ يمكن اختيار أيّهما أولًا.
+    if(currentTarget.id==='Shift2'){
+      const id=key.dataset.key;
+      if(id==='Shift' || id==='2'){
+        comboPressed.add(id);
+        key.classList.add('combo-selected');
+        messageEl.style.color='#0066cc';
+        if(comboPressed.has('Shift') && comboPressed.has('2')){
+          document.querySelectorAll('.key[data-key="Shift"], .key[data-key="2"]').forEach(k=>{
+            k.classList.remove('combo-selected');
+            k.classList.add('correct');
+          });
+          messageEl.textContent='أحسنت! ضغطت على Shift و2 معًا، حصلت على الجوهرة 💎';
+          messageEl.style.color='#28a745';
+          currentKeyIndex++;
+          comboPressed.clear();
+          setTimeout(()=>{messageEl.textContent='';updateInstruction()},900);
+        }else{
+          messageEl.textContent=id==='Shift'
+            ? 'ممتاز! الآن اضغط على الرقم 2 أيضًا.'
+            : 'جيد! الآن اضغط على مفتاح Shift أيضًا.';
+        }
+      }else{
+        key.classList.remove('shake');void key.offsetWidth;key.classList.add('shake');
+        messageEl.textContent='اختر مفتاح Shift والرقم 2 معًا.';
+        messageEl.style.color='#d9534f';
+        setTimeout(()=>key.classList.remove('shake'),300);
+      }
+      return;
+    }
+
+    if(key.dataset.key===currentTarget.id){
+      key.classList.add('correct');
+      messageEl.textContent='أحسنت! لقد وجدت الجوهرة 💎';
+      messageEl.style.color='#28a745';
+      currentKeyIndex++;
+      setTimeout(()=>{messageEl.textContent='';updateInstruction()},750);
+    }else{
+      key.classList.remove('shake');void key.offsetWidth;key.classList.add('shake');
+      messageEl.textContent='مفتاح خاطئ، حاول مرة أخرى!';
+      messageEl.style.color='#d9534f';
+      setTimeout(()=>key.classList.remove('shake'),300);
+    }
+  });
+});
+function startGame(){
+  currentKeyIndex=0;messageEl.textContent='';
+  comboPressed.clear();
+  document.querySelectorAll('.key').forEach(k=>k.classList.remove('correct','shake','combo-selected'));
+  headerEl.style.display='block';keyboardEl.style.display='flex';winScreen.style.display='none';
+  updateInstruction();
+}
+function updateInstruction(){
+  if(currentKeyIndex<keysToFind.length){
+    instructionEl.textContent=keysToFind[currentKeyIndex].text;
+  }else{
+    headerEl.style.display='none';keyboardEl.style.display='none';winScreen.style.display='block';
+  }
+}
+window.addEventListener('load',startGame);
+</script>
+</body>
+</html>
